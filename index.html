@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy User Profile Analytics</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: #5a67d8;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5a67d8;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #5a67d8, #667eea);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(90, 103, 216, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #718096, #4a5568);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #5a67d8;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+
+        .status.error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #742a2a;
+        }
+
+        .status.info {
+            background: #ebf8ff;
+            border: 1px solid #90cdf4;
+            color: #2a69ac;
+        }
+
+        .analytics-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .profile-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .wallet-info {
+            background: linear-gradient(135deg, #4fd1c7, #38b2ac);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .feature-list li:before {
+            content: "🔐";
+            position: absolute;
+            left: 0;
+            top: 10px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .profile-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Privacy User Profile Analytics</h1>
+            <p>Confidential User Analysis with Fully Homomorphic Encryption</p>
+        </div>
+
+        <div id="loadingIndicator" class="card" style="text-align: center;">
+            <h2>⏳ Loading Application...</h2>
+            <p>Initializing ethers.js library from CDN...</p>
+        </div>
+
+        <div id="walletInfo" class="wallet-info" style="display: none;">
+            <h3>Connected Wallet</h3>
+            <div class="wallet-address" id="walletAddress"></div>
+        </div>
+
+        <div class="card" id="mainContent" style="display: none;">
+            <h2>🌟 Platform Features</h2>
+            <ul class="feature-list">
+                <li>Create encrypted user profiles with demographic and behavioral data</li>
+                <li>Perform confidential analytics without exposing sensitive information</li>
+                <li>Compare user profiles while maintaining privacy</li>
+                <li>Generate insights for authorized analysts only</li>
+                <li>Anonymous statistical distributions for population analysis</li>
+                <li>Secure similarity scoring between user profiles</li>
+            </ul>
+        </div>
+
+        <div class="analytics-section" id="analyticsSection" style="display: none;">
+            <div class="card">
+                <h2>📊 Platform Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="userProfileStatus">❌</div>
+                        <div class="stat-label">Your Profile</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="analystStatus">❌</div>
+                        <div class="stat-label">Analyst Access</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="loadStats()">🔄 Refresh Statistics</button>
+                <button class="btn btn-secondary" id="connectBtn" onclick="connectWallet()">🔗 Connect Wallet</button>
+                <button class="btn btn-secondary" id="disconnectBtn" onclick="disconnectWallet()" style="display: none;">❌ Disconnect</button>
+            </div>
+
+            <div class="card">
+                <h2>👤 Create User Profile</h2>
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="ageRange">Age Range:</label>
+                        <select id="ageRange">
+                            <option value="0">0-17</option>
+                            <option value="1">18-25</option>
+                            <option value="2">26-35</option>
+                            <option value="3">36-45</option>
+                            <option value="4">46-55</option>
+                            <option value="5">56-65</option>
+                            <option value="6">66-75</option>
+                            <option value="7">76+</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="incomeLevel">Income Level (0-9):</label>
+                        <select id="incomeLevel">
+                            <option value="0">0 - Very Low</option>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Below Average</option>
+                            <option value="3">3 - Lower Middle</option>
+                            <option value="4">4 - Middle</option>
+                            <option value="5">5 - Upper Middle</option>
+                            <option value="6">6 - Above Average</option>
+                            <option value="7">7 - High</option>
+                            <option value="8">8 - Very High</option>
+                            <option value="9">9 - Premium</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="spendingPattern">Spending Pattern (0-9):</label>
+                        <select id="spendingPattern">
+                            <option value="0">0 - Very Conservative</option>
+                            <option value="1">1 - Conservative</option>
+                            <option value="2">2 - Careful</option>
+                            <option value="3">3 - Moderate</option>
+                            <option value="4">4 - Balanced</option>
+                            <option value="5">5 - Regular</option>
+                            <option value="6">6 - Active</option>
+                            <option value="7">7 - Frequent</option>
+                            <option value="8">8 - High Spender</option>
+                            <option value="9">9 - Premium Spender</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="riskTolerance">Risk Tolerance (0-9):</label>
+                        <select id="riskTolerance">
+                            <option value="0">0 - Risk Averse</option>
+                            <option value="1">1 - Very Conservative</option>
+                            <option value="2">2 - Conservative</option>
+                            <option value="3">3 - Cautious</option>
+                            <option value="4">4 - Moderate</option>
+                            <option value="5">5 - Balanced</option>
+                            <option value="6">6 - Growth Oriented</option>
+                            <option value="7">7 - Aggressive</option>
+                            <option value="8">8 - High Risk</option>
+                            <option value="9">9 - Maximum Risk</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="digitalActivity">Digital Activity (0-9):</label>
+                        <select id="digitalActivity">
+                            <option value="0">0 - Minimal</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Below Average</option>
+                            <option value="4">4 - Average</option>
+                            <option value="5">5 - Above Average</option>
+                            <option value="6">6 - High</option>
+                            <option value="7">7 - Very High</option>
+                            <option value="8">8 - Extremely High</option>
+                            <option value="9">9 - Digital Native</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="locationCluster">Location Cluster (0-19):</label>
+                        <select id="locationCluster">
+                            <option value="0">0 - Urban Metro</option>
+                            <option value="1">1 - Suburban</option>
+                            <option value="2">2 - Rural</option>
+                            <option value="3">3 - Coastal</option>
+                            <option value="4">4 - Mountain</option>
+                            <option value="5">5 - Desert</option>
+                            <option value="6">6 - Northern</option>
+                            <option value="7">7 - Southern</option>
+                            <option value="8">8 - Eastern</option>
+                            <option value="9">9 - Western</option>
+                            <option value="10">10 - Central</option>
+                            <option value="11">11 - International</option>
+                            <option value="12">12 - Tech Hub</option>
+                            <option value="13">13 - Financial District</option>
+                            <option value="14">14 - University Town</option>
+                            <option value="15">15 - Industrial</option>
+                            <option value="16">16 - Tourist Area</option>
+                            <option value="17">17 - Residential</option>
+                            <option value="18">18 - Commercial</option>
+                            <option value="19">19 - Mixed Zone</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="createProfile()">🛡️ Create Encrypted Profile</button>
+            </div>
+        </div>
+
+        <div class="card" id="dashboardSection" style="display: none;">
+            <h2>📈 Analytics Dashboard</h2>
+            <p>Update user analytics and generate private insights (Analyst access required)</p>
+
+            <div class="form-group">
+                <label for="targetUserAddress">Target User Address:</label>
+                <input type="text" id="targetUserAddress" placeholder="0x..." />
+            </div>
+
+            <button class="btn" onclick="updateAnalytics()">📊 Update Analytics</button>
+            <button class="btn" onclick="generateInsights()">🔍 Generate Insights</button>
+            <button class="btn btn-secondary" onclick="compareProfiles()">⚖️ Compare Profiles</button>
+        </div>
+
+        <div id="statusMessages"></div>
+    </div>
+
+    <script>
+        // Multiple CDN sources for ethers.js
+        const ETHERS_CDN_SOURCES = [
+            'https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js',
+            'https://cdn.skypack.dev/ethers@5.7.2',
+            'https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js'
+        ];
+
+        let currentCDNIndex = 0;
+        let ethersLoadAttempts = 0;
+        const maxLoadAttempts = ETHERS_CDN_SOURCES.length;
+
+        function loadEthersScript() {
+            if (ethersLoadAttempts >= maxLoadAttempts) {
+                console.error('All ethers CDN sources failed');
+                showStatusMessage('Failed to load ethers.js library from all CDN sources. Please check your internet connection.', 'error');
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = ETHERS_CDN_SOURCES[currentCDNIndex];
+
+            script.onload = function() {
+                console.log(`Ethers loaded successfully from: ${ETHERS_CDN_SOURCES[currentCDNIndex]}`);
+                if (typeof ethers !== 'undefined') {
+                    window.ethers = ethers;
+                    initializeApp();
+                } else {
+                    console.warn('Ethers script loaded but ethers object not available');
+                    tryNextCDN();
+                }
+            };
+
+            script.onerror = function() {
+                console.warn(`Failed to load ethers from: ${ETHERS_CDN_SOURCES[currentCDNIndex]}`);
+                tryNextCDN();
+            };
+
+            document.head.appendChild(script);
+        }
+
+        function tryNextCDN() {
+            currentCDNIndex++;
+            ethersLoadAttempts++;
+            if (ethersLoadAttempts < maxLoadAttempts) {
+                console.log(`Trying next CDN source: ${ETHERS_CDN_SOURCES[currentCDNIndex]}`);
+                loadEthersScript();
+            }
+        }
+
+        function showStatusMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessages');
+            if (statusDiv) {
+                const statusElement = document.createElement('div');
+                statusElement.className = `status ${type}`;
+                statusElement.textContent = message;
+                statusDiv.appendChild(statusElement);
+            } else {
+                console.log(`${type.toUpperCase()}: ${message}`);
+            }
+        }
+
+        function initializeApp() {
+            // Hide loading indicator and show main content
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('analyticsSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            setTimeout(() => {
+                init();
+                setupEventListeners();
+            }, 100);
+        }
+
+        // Start loading ethers when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEthersScript();
+        });
+    </script>
+    <script>
+        // Contract configuration
+        const CONTRACT_ADDRESS = "0xcf391b59a8322b0a6597041aeca903eed7855466";
+        const CONTRACT_ABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "analyst",
+                        "type": "address"
+                    }
+                ],
+                "name": "AnalystAuthorized",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "analyst",
+                        "type": "address"
+                    }
+                ],
+                "name": "AnalystRevoked",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "AnalyticsUpdated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "InsightsGenerated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ProfileCreated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "timestamp",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ProfileUpdated",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "ageDistribution",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "analyst",
+                        "type": "address"
+                    }
+                ],
+                "name": "authorizeAnalyst",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "authorizedAnalysts",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user1",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "user2",
+                        "type": "address"
+                    }
+                ],
+                "name": "calculateSimilarityScore",
+                "outputs": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "",
+                        "type": "bytes32"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user1",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "user2",
+                        "type": "address"
+                    }
+                ],
+                "name": "compareUserProfiles",
+                "outputs": [
+                    {
+                        "internalType": "bytes32[]",
+                        "name": "",
+                        "type": "bytes32[]"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "_ageRange",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_incomeLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_spendingPattern",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_riskTolerance",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_digitalActivity",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_locationCluster",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "createUserProfile",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_creditScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_socialInfluence",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_purchasePower",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_lifestyleSegment",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "generatePrivateInsights",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAnonymousDistributions",
+                "outputs": [
+                    {
+                        "internalType": "uint32[8]",
+                        "name": "ages",
+                        "type": "uint32[8]"
+                    },
+                    {
+                        "internalType": "uint32[10]",
+                        "name": "incomes",
+                        "type": "uint32[10]"
+                    },
+                    {
+                        "internalType": "uint32[10]",
+                        "name": "spending",
+                        "type": "uint32[10]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getTotalUsers",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "getUserProfileInfo",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "createdAt",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastUpdated",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "hasAnalytics",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "hasInsights",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "incomeDistribution",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "isProfileActive",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "owner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "requestId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "ageRange",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "incomeLevel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "spendingPattern",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "riskTolerance",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "digitalActivity",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "locationCluster",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "signatures",
+                        "type": "bytes[]"
+                    }
+                ],
+                "name": "processProfileDecryption",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    }
+                ],
+                "name": "requestProfileDecryption",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "analyst",
+                        "type": "address"
+                    }
+                ],
+                "name": "revokeAnalyst",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "spendingDistribution",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalUsers",
+                "outputs": [
+                    {
+                        "internalType": "uint32",
+                        "name": "",
+                        "type": "uint32"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "_totalInteractions",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "_avgSessionDuration",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_preferredChannel",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_loyaltyScore",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "_churnRisk",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "_isVIP",
+                        "type": "bool"
+                    }
+                ],
+                "name": "updateAnalytics",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        let provider;
+        let signer;
+        let contract;
+        let userAccount;
+
+        // Sepolia testnet configuration
+        const SEPOLIA_CHAIN_ID = '0xaa36a7'; // 11155111 in hex
+        const SEPOLIA_CONFIG = {
+            chainId: SEPOLIA_CHAIN_ID,
+            chainName: 'Sepolia Test Network',
+            nativeCurrency: {
+                name: 'Sepolia ETH',
+                symbol: 'SEP',
+                decimals: 18
+            },
+            rpcUrls: ['https://sepolia.infura.io/v3/'],
+            blockExplorerUrls: ['https://sepolia.etherscan.io/']
+        };
+
+        // Initialize the app
+        async function init() {
+            // Check if ethers is loaded
+            if (typeof ethers === 'undefined') {
+                showStatus('Error: ethers.js library failed to load. Please refresh the page.', 'error');
+                return;
+            }
+
+            if (typeof window.ethereum !== 'undefined') {
+                showStatus('MetaMask detected. Click "Connect Wallet" to start.', 'info');
+                showStatus('Application will automatically switch to Sepolia testnet.', 'info');
+            } else {
+                showStatus('Please install MetaMask to use this DApp.', 'error');
+            }
+        }
+
+        // Check and switch to Sepolia network
+        async function ensureSepoliaNetwork() {
+            try {
+                const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+                if (currentChainId !== SEPOLIA_CHAIN_ID) {
+                    showStatus('Switching to Sepolia testnet...', 'info');
+
+                    try {
+                        // Try to switch to Sepolia
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: SEPOLIA_CHAIN_ID }],
+                        });
+                        showStatus('Successfully switched to Sepolia testnet! ✅', 'success');
+                    } catch (switchError) {
+                        // If network doesn't exist, add it
+                        if (switchError.code === 4902) {
+                            showStatus('Adding Sepolia testnet to MetaMask...', 'info');
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [SEPOLIA_CONFIG],
+                            });
+                            showStatus('Sepolia testnet added and connected! ✅', 'success');
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                } else {
+                    showStatus('Already connected to Sepolia testnet! ✅', 'success');
+                }
+                return true;
+            } catch (error) {
+                showStatus('Failed to switch to Sepolia: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        // Connect to MetaMask wallet
+        async function connectWallet() {
+            try {
+                showStatus('Connecting wallet...', 'info');
+
+                // 1. Check if MetaMask is available
+                if (!window.ethereum) {
+                    throw new Error('MetaMask not detected');
+                }
+
+                // 2. Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // 3. Ensure we're on Sepolia network
+                const networkSwitched = await ensureSepoliaNetwork();
+                if (!networkSwitched) {
+                    throw new Error('Please switch to Sepolia testnet manually');
+                }
+
+                // 4. Set up provider and signer
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                userAccount = await signer.getAddress();
+
+                // 5. Initialize contract
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+                // 6. Update UI
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('walletAddress').textContent = userAccount;
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'inline-block';
+
+                showStatus('Connected to Sepolia successfully! ✅', 'success');
+
+                // 7. Load initial data
+                await loadStats();
+
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showStatus('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Create user profile
+        async function createProfile() {
+            if (!contract) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            try {
+                const ageRange = document.getElementById('ageRange').value;
+                const incomeLevel = document.getElementById('incomeLevel').value;
+                const spendingPattern = document.getElementById('spendingPattern').value;
+                const riskTolerance = document.getElementById('riskTolerance').value;
+                const digitalActivity = document.getElementById('digitalActivity').value;
+                const locationCluster = document.getElementById('locationCluster').value;
+
+                showStatus('Creating encrypted profile...', 'info');
+
+                const tx = await contract.createUserProfile(
+                    ageRange,
+                    incomeLevel,
+                    spendingPattern,
+                    riskTolerance,
+                    digitalActivity,
+                    locationCluster
+                );
+
+                showStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                showStatus('Profile created successfully!', 'success');
+                await loadStats();
+            } catch (error) {
+                console.error('Error creating profile:', error);
+                showStatus('Failed to create profile: ' + error.message, 'error');
+            }
+        }
+
+        // Load platform statistics
+        async function loadStats() {
+            if (!contract) return;
+
+            try {
+                const totalUsers = await contract.getTotalUsers();
+                document.getElementById('totalUsers').textContent = totalUsers.toString();
+
+                if (userAccount) {
+                    const profileActive = await contract.isProfileActive(userAccount);
+                    document.getElementById('userProfileStatus').textContent = profileActive ? '✅' : '❌';
+
+                    const isAnalyst = await contract.authorizedAnalysts(userAccount);
+                    document.getElementById('analystStatus').textContent = isAnalyst ? '✅' : '❌';
+                }
+
+                showStatus('Statistics updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                showStatus('Failed to load statistics: ' + error.message, 'error');
+            }
+        }
+
+        // Update analytics for a user (analyst only)
+        async function updateAnalytics() {
+            if (!contract) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const targetAddress = document.getElementById('targetUserAddress').value;
+            if (!targetAddress) {
+                showStatus('Please enter a target user address.', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Updating analytics...', 'info');
+
+                // Sample analytics data
+                const tx = await contract.updateAnalytics(
+                    targetAddress,
+                    1000, // totalInteractions
+                    300,  // avgSessionDuration
+                    1,    // preferredChannel
+                    75,   // loyaltyScore
+                    25,   // churnRisk
+                    false // isVIP
+                );
+
+                showStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                showStatus('Analytics updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating analytics:', error);
+                showStatus('Failed to update analytics: ' + error.message, 'error');
+            }
+        }
+
+        // Generate private insights (analyst only)
+        async function generateInsights() {
+            if (!contract) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const targetAddress = document.getElementById('targetUserAddress').value;
+            if (!targetAddress) {
+                showStatus('Please enter a target user address.', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Generating private insights...', 'info');
+
+                // Sample insights data
+                const tx = await contract.generatePrivateInsights(
+                    targetAddress,
+                    7, // creditScore
+                    5, // socialInfluence
+                    6, // purchasePower
+                    8  // lifestyleSegment
+                );
+
+                showStatus('Transaction submitted. Waiting for confirmation...', 'info');
+                await tx.wait();
+
+                showStatus('Private insights generated successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating insights:', error);
+                showStatus('Failed to generate insights: ' + error.message, 'error');
+            }
+        }
+
+        // Compare two user profiles (analyst only)
+        async function compareProfiles() {
+            if (!contract) {
+                showStatus('Please connect your wallet first.', 'error');
+                return;
+            }
+
+            const user1 = userAccount;
+            const user2 = document.getElementById('targetUserAddress').value;
+
+            if (!user2) {
+                showStatus('Please enter a target user address to compare with.', 'error');
+                return;
+            }
+
+            try {
+                showStatus('Comparing user profiles...', 'info');
+
+                const similarityScore = await contract.calculateSimilarityScore(user1, user2);
+                showStatus(`Profile comparison completed. Similarity score: ${similarityScore}`, 'success');
+            } catch (error) {
+                console.error('Error comparing profiles:', error);
+                showStatus('Failed to compare profiles: ' + error.message, 'error');
+            }
+        }
+
+        // Display status messages
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessages');
+            const statusElement = document.createElement('div');
+            statusElement.className = `status ${type}`;
+            statusElement.textContent = message;
+
+            statusDiv.appendChild(statusElement);
+
+            // Remove old messages
+            const statusElements = statusDiv.getElementsByClassName('status');
+            if (statusElements.length > 3) {
+                statusDiv.removeChild(statusElements[0]);
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet() {
+            userAccount = null;
+            contract = null;
+            provider = null;
+            signer = null;
+
+            document.getElementById('walletInfo').style.display = 'none';
+            document.getElementById('connectBtn').style.display = 'inline-block';
+            document.getElementById('disconnectBtn').style.display = 'none';
+
+            showStatus('Wallet disconnected.', 'info');
+
+            // Reset statistics display
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('userProfileStatus').textContent = '❌';
+            document.getElementById('analystStatus').textContent = '❌';
+        }
+
+        // Handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                disconnectWallet();
+                showStatus('Please connect your wallet to continue.', 'error');
+            } else if (accounts[0] !== userAccount) {
+                window.location.reload();
+            }
+        }
+
+        // Handle network changes
+        function handleChainChanged(chainId) {
+            if (chainId !== SEPOLIA_CHAIN_ID) {
+                showStatus('Please switch back to Sepolia testnet.', 'error');
+            } else {
+                showStatus('Connected to Sepolia testnet.', 'success');
+            }
+        }
+
+        // Set up event listeners for MetaMask events
+        function setupEventListeners() {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', handleChainChanged);
+            }
+        }
+
+        // Remove duplicate initialization - now handled by initializeApp() function
+    </script>
+</body>
+</html>
